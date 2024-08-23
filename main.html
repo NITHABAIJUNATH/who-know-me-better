@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Who Knows Me Better?</title>
+    <style>
+        body {
+            background-color: #FFCCCB; /* Light baby pink background */
+            font-family: Arial, sans-serif;
+            color: white;
+            margin: 0;
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            text-align: center;
+            overflow: hidden;
+            position: relative; /* For positioning background text */
+        }
+
+        /* Background Text */
+        .background-text {
+            position: absolute;
+            top: 10%; /* Move text to the top */
+            left: 50%;
+            transform: translate(-50%, 0);
+            font-size: 100px; /* Large font size */
+            font-family: 'Brush Script MT', cursive; /* Cursive font */
+            color: rgba(249, 5, 168, 0.2); /* Light pink color with transparency */
+            z-index: 0; /* Place it behind other elements */
+            white-space: nowrap;
+        }
+
+        .quiz-content {
+            background-color: rgba(0, 0, 0, 0.0); /* Transparent background */
+            padding: 20px;
+            z-index: 2; /* Ensure it's above the sprinkles */
+        }
+
+        /* Styled dropdown */
+        .dropdown select {
+            background-color: transparent; /* Transparent background */
+            color: #FF69B4; /* Pink text */
+            border: 2px solid #FF69B4; /* Pink border */
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 18px;
+            appearance: none;
+            outline: none;
+            text-align-last: center; /* Center align the text */
+            cursor: pointer;
+        }
+
+        .dropdown select option {
+            background-color: #FFCCCB; /* Light baby pink background for options */
+            color: #FF69B4; /* Pink text */
+            text-align: center;
+        }
+
+        /* Dropdown arrow */
+        .dropdown select::-ms-expand {
+            display: none;
+        }
+
+        .dropdown:after {
+            content: '▼';
+            color: #FF69B4;
+            font-size: 18px;
+            position: absolute;
+            right: 10px;
+            top: calc(50% - 10px);
+            pointer-events: none;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .correct, .incorrect {
+            display: none;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        /* Next arrow */
+        .next-arrow {
+            margin-top: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* Large Snow Sprinkles */
+        .sprinkle {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            width: 20px; /* Larger size */
+            height: 20px; /* Larger size */
+            animation: sprinkle-animation 15s infinite ease-in-out;
+            z-index: 1;
+            opacity: 0.8; /* Slight transparency for a soft effect */
+        }
+
+        /* Sprinkle Animation */
+        @keyframes sprinkle-animation {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Text -->
+    <div class="background-text">Do You Know Me?</div>
+
+    <!-- Sprinkles -->
+    <div id="sprinkles"></div>
+
+    <div class="quiz-content">
+        <h1 id="question-title">Who Knows Me Better?</h1>
+        <p id="question-text"> full name?</p>
+        <div class="dropdown">
+            <select id="question1" onchange="checkAnswer(this)">
+                <option value="">Select an answer</option>
+                <option value="nitha baijunath p">Red</option>
+                <option value="nitha p baijunath">Blue</option>
+                <option value="nitha p">Green</option>
+                <option value="nitha ">Purple</option>
+            </select>
+        </div>
+        <div id="result1" class="correct">Correct!</div>
+        <div id="result2" class="incorrect">Incorrect!</div>
+        <div class="next-arrow" onclick="nextQuestion()">→</div>
+    </div>
+
+    <script>
+        const questions = [
+            { question: "correct name?", correctAnswer: "nitha baijunath p", options: ["nitha baijunath p", "nitha p baijunath", "nitha p", "nitha"] },
+            { question: "first periods age", correctAnswer: "12", options: ["18", "12", "15", "89"] },
+            { question: "correct loc of home", correctAnswer: "kaloor road", options: ["kozhikode", "kaloor road", "mankavu", "railway station"] },
+            { question: "fav food", correctAnswer: "soofi mandhi", options: ["biriyani", "ferry puttu", "soofi mandhi", "ghee rice"] },
+            { question: "how i react when angry", correctAnswer: "silent", options: ["react like a bomb", "cry", "laugh", "silent"] },
+            { question: "love language", correctAnswer: "holding hands", options: ["laugh", "beat", "holding hands", "kill them"] },
+            { question: "my naad", correctAnswer: "vadakara", options: ["kozhikode", "vadakara", "kasargod", "kannur"] },
+            { question: "fav thing to do boring?", correctAnswer: "music", options: ["walk", "laugh", "music", "dance"] },
+            { question: "one thing i dont do", correctAnswer: "going out after 10 pm night", options: ["smoke", "fire dance", "drugs", "going out after 10 pm night"] },
+            { question: "brother name", correctAnswer: "sayooj", options: ["nithin", "sarang", "sanjay", "sayooj"] },
+            { question: "i hate the most", correctAnswer: "santhosh", options: ["santhosh", "cousin bro", "rapists", "kozhis"] },
+            { question: "fav teacher", correctAnswer: "arya miss", options: ["jisha", "indu ", "arya miss", "sreemol"] },
+            { question: "calling / texting ", correctAnswer: "text ", options: ["call", "text ", "block", "nothing"] },
+            { question: "am i possesive or not", correctAnswer: "little", options: ["yes very much", "little", "not at all", "only poosesive"] },
+            { question: "ven upset what i like most", correctAnswer: "hug", options: ["icecream", "beat and kill me", "hug", "listen me"] },
+            { question: "how much years did i study dance", correctAnswer: "10", options: ["7", "10", "2", "5"] },
+            { question: "most fear", correctAnswer: "speed", options: ["cocrokach", "palli", "snake", "speed"] },
+            { question: "how much time have i colured my hair", correctAnswer: "3", options: ["1", "2", "7", "3"] },
+            { question: "one thing i hate the most", correctAnswer: "lies", options: ["robbing", "gossping", "lies", "changing prority"] },
+            { question: "how much time have i colur", correctAnswer: "3", options: ["1", "2", "7", "3"] },
+            
+            
+            
+
+        ];
+        
+
+        let currentQuestionIndex = 0;
+
+        function loadQuestion(index) {
+            const question = questions[index];
+            document.getElementById('question-title').innerText = `Question ${index + 1}`;
+            document.getElementById('question-text').innerText = question.question;
+            const dropdown = document.getElementById('question1');
+            dropdown.innerHTML = '<option value="">Select an answer</option>'; // Clear previous options
+            question.options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.innerText = option.charAt(0).toUpperCase() + option.slice(1);
+                dropdown.appendChild(optionElement);
+            });
+            document.getElementById('result1').style.display = 'none';
+            document.getElementById('result2').style.display = 'none';
+            document.querySelector('.next-arrow').style.display = 'none'; // Hide the next arrow initially
+        }
+
+        function checkAnswer(select) {
+            const question = questions[currentQuestionIndex];
+            if (select.value === question.correctAnswer) {
+                document.getElementById('result1').style.display = 'block';
+                document.getElementById('result2').style.display = 'none';
+            } else {
+                document.getElementById('result2').style.display = 'block';
+                document.getElementById('result1').style.display = 'none';
+            }
+            document.querySelector('.next-arrow').style.display = 'block'; // Show the next arrow
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            } else {
+                document.querySelector('.quiz-content').innerHTML = '<h1>Quiz Completed!</h1>';
+            }
+        }
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            } else {
+                document.querySelector('.quiz-content').innerHTML = `<h1>Quiz Completed!</h1><p>You know Nitha's with score ${score}, well done!</p>`;
+            }
+        }
+        // Generate a bulk amount of sprinkles
+        function createSprinkle() {
+            const sprinkle = document.createElement('div');
+            sprinkle.classList.add('sprinkle');
+            sprinkle.style.left = `${Math.random() * 100}vw`;
+            sprinkle.style.top = `${Math.random() * -100}vh`;
+            document.body.appendChild(sprinkle);
+
+            // Remove sprinkle after animation ends
+            sprinkle.addEventListener('animationend', () => {
+                sprinkle.remove();
+            });
+        }
+
+        for (let i = 0; i < 300; i++) {
+            createSprinkle();
+        }
+
+        // Load the first question initially
+        loadQuestion(currentQuestionIndex);
+    </script>
+
+</body>
+</html>
+
